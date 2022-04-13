@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Application.InputModels;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -30,5 +31,22 @@ public class UserController : ControllerBase
 			return UnprocessableEntity(createUser);
 
 		return Created(createUser, "Account create successfully!");
+	}
+
+	// <summary>
+	///		Delete user by id
+	/// </summary>
+	/// <param name="id">User data</param>
+	/// <response code="200">delete user</response>
+	/// <response code="422">If there is no user</response>
+	[HttpDelete("{id}")]
+	public IActionResult Delete(Guid id)
+	{
+		var deleteUser = _userService.Delete(id);
+
+		if (!deleteUser.Contains("deleted"))
+			return UnprocessableEntity(deleteUser);
+
+		return Ok("Account deleted successfully!");
 	}
 }
