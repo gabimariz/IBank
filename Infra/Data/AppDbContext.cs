@@ -16,7 +16,11 @@ public class AppDbContext : DbContext
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		// Configure Student & StudentAddress entity
-		modelBuilder.Entity<User>()
-			.HasOne(s => s.Account);
+		modelBuilder.Entity<Account>()
+			.HasOne<User>(e => e.User)
+			.WithOne(d => d.Account)
+			.HasForeignKey<Account>(e => e.UserId)
+			.IsRequired(true)
+			.OnDelete(DeleteBehavior.Cascade) ;
 	}
 }
