@@ -33,9 +33,12 @@ public class UserRepository : IUserRepository
 
 	public void Delete(Guid id)
 	{
-		var user = _appDbContext.Users!.Find(id);
+		var user = _appDbContext.Users!
+			.Where(p => p.Id == id)
+			.Include(p => p.Account)
+			.FirstOrDefault();
 
-		_appDbContext.Users.Remove(user!);
+		_appDbContext.Users!.Remove(user!);
 	}
 
 	public void Save()
