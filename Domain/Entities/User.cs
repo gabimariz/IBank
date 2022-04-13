@@ -10,8 +10,6 @@ public class User
 
 	public virtual Account? Account { get; set; }
 
-	public string? Agency { get; set; }
-
 	public string? Email { get; set; }
 
 	public string? Password { get; set; }
