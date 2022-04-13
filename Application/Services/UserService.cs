@@ -73,12 +73,13 @@ public class UserService : IUserService<UserInputModel>
 		try
 		{
 			_userRepository.Delete(id);
+			_userRepository.Save();
 
-			return "Account successfully deleted";
+			return "deleted";
 		}
 		catch (Exception err)
 		{
-			throw new Exception($"{nameof(id)}: {err.Message}");
+			return($"{nameof(id)}: {err.Message}");
 		}
 	}
 }
