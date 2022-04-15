@@ -6,6 +6,7 @@ namespace Infra.Data;
 public class AppDbContext : DbContext
 {
 	public DbSet<User>? Users { get; set; }
+	public DbSet<PixTransfer>? PixTransfers { get; set; }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
@@ -21,6 +22,12 @@ public class AppDbContext : DbContext
 			.WithOne(d => d.Account)
 			.HasForeignKey<Account>(e => e.UserId)
 			.IsRequired(true)
-			.OnDelete(DeleteBehavior.Cascade) ;
+			.OnDelete(DeleteBehavior.Cascade);
+
+		modelBuilder.Entity<User>()
+			.HasIndex(i => i.Email).IsUnique();
+
+		modelBuilder.Entity<User>()
+			.HasIndex(i => i.Cpf).IsUnique();
 	}
 }
