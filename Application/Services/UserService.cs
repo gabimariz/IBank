@@ -1,5 +1,6 @@
 using Application.InputModels;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
 using Domain.Utils;
 
@@ -14,6 +15,17 @@ public class UserService : IUserService<UserInputModel>
 		_userRepository = userRepository;
 	}
 
+	public User GetById(Guid id)
+	{
+		try
+		{
+			return _userRepository.GetById(id);;
+		}
+		catch (Exception err)
+		{
+			throw new Exception();
+		}
+	}
 	public string GetByCpf(string cpf)
 	{
 		return _userRepository.GetByCpf(cpf);
@@ -35,7 +47,8 @@ public class UserService : IUserService<UserInputModel>
 					Money = 0,
 				},
 				Email = user.Email,
-				Password = user.Password,
+				Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
+				Role = Roles.User
 			});
 
 			_userRepository.Save();
