@@ -1,6 +1,5 @@
 
 using System.ComponentModel.DataAnnotations;
-using Domain.Entities;
 
 namespace Application.InputModels;
 
