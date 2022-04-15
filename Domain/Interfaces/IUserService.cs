@@ -2,8 +2,9 @@ using Domain.Entities;
 
 namespace Domain.Interfaces;
 
-public interface IUserService<T>
+public interface IUserService<in T>
 {
+	User GetById(Guid id);
 	string GetByCpf(string cpf);
 
 	string Insert(T user);
