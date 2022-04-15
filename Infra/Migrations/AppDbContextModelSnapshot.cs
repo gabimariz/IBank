@@ -45,6 +45,26 @@ namespace Infra.Migrations
                     b.ToTable("Account");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PixTransfer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("From")
+                        .HasColumnType("char(36)");
+
+                    b.Property<double>("Money")
+                        .HasColumnType("double");
+
+                    b.Property<Guid>("To")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PixTransfers");
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -52,10 +72,10 @@ namespace Infra.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Cpf")
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("FullName")
                         .HasColumnType("longtext");
@@ -63,7 +83,16 @@ namespace Infra.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Cpf")
+                        .IsUnique();
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
