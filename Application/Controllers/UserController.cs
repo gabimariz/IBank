@@ -1,6 +1,8 @@
-using System.ComponentModel;
 using Application.InputModels;
+using Domain.Entities;
+using Domain.Enums;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Controllers;
@@ -14,6 +16,24 @@ public class UserController : ControllerBase
 	public UserController(IUserService<UserInputModel> userService)
 	{
 		_userService = userService;
+	}
+
+	/// <summary>
+	///		Find user by Id
+	/// </summary>
+	/// <param name="id">User id</param>
+	/// <response code="200">Return user found by id</response>
+	/// <response code="404">User not found</response>
+	[HttpGet("{id}")]
+	[Authorize(Roles = "User")]
+	public ActionResult<User> GetById([FromRoute] Guid id)
+	{
+		var findUser = Ok(_userService.GetById(id));
+
+		if(findUser.Value != null)
+			return Ok(findUser);
+
+		return NotFound();
 	}
 
 	/// <summary>
@@ -33,13 +53,14 @@ public class UserController : ControllerBase
 		return Created(createUser, "Account create successfully!");
 	}
 
-	// <summary>
+	/// <summary>
 	///		Delete user by id
 	/// </summary>
 	/// <param name="id">User data</param>
 	/// <response code="200">delete user</response>
 	/// <response code="422">If there is no user</response>
 	[HttpDelete("{id}")]
+	[Authorize]
 	public IActionResult Delete(Guid id)
 	{
 		var deleteUser = _userService.Delete(id);
