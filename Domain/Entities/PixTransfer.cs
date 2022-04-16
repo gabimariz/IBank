@@ -1,0 +1,12 @@
+namespace Domain.Entities;
+
+public class PixTransfer
+{
+	public Guid Id { get; set; }
+
+	public double Money { get; set; }
+
+	public Guid To { get; set; }
+
+	public Guid From { get; set; }
+}
