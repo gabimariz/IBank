@@ -29,11 +29,13 @@ public class UserRepository : IUserRepository
 
 	}
 
-	public string GetByCpf(string cpf)
+	public User GetByCpf(string cpf)
 	{
-		var user = _appDbContext.Users!.Single(p => p.Cpf == cpf);
+		var user = _appDbContext.Users!
+			.Include(p => p.Account)
+			.FirstOrDefault(p => p.Cpf == cpf);
 
-		return user.Cpf!;
+		return user!;
 	}
 
 	public void Insert(User user)
