@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Enums;
 
 namespace Domain.Entities;
@@ -14,6 +15,7 @@ public class User
 
 	public string? Email { get; set; }
 
+	[JsonIgnore]
 	public string? Password { get; set; }
 
 	public Roles Role { get; set; }
