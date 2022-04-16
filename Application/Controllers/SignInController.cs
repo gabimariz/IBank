@@ -22,7 +22,7 @@ public class SignInController : ControllerBase
 	{
 		var user = _signInService.SignIn(signIn.Email!, signIn.Password!);
 
-		if (user == null)
+		if (user == null!)
 			return NotFound(new { message = "user not found!" });
 
 		var token = _tokenService.GenerateToken(user);
