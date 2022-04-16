@@ -19,14 +19,14 @@ public class UserService : IUserService<UserInputModel>
 	{
 		try
 		{
-			return _userRepository.GetById(id);;
+			return _userRepository.GetById(id);
 		}
-		catch (Exception err)
+		catch (Exception)
 		{
 			throw new Exception();
 		}
 	}
-	public string GetByCpf(string cpf)
+	public User GetByCpf(string cpf)
 	{
 		return _userRepository.GetByCpf(cpf);
 	}
