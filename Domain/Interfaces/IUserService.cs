@@ -5,7 +5,7 @@ namespace Domain.Interfaces;
 public interface IUserService<in T>
 {
 	User GetById(Guid id);
-	string GetByCpf(string cpf);
+	User GetByCpf(string cpf);
 
 	string Insert(T user);
 
