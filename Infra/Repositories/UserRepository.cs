@@ -29,21 +29,6 @@ public class UserRepository : IUserRepository
 
 	}
 
-	public string GetByCpf(string cpf)
-	{
-		var user = _appDbContext.Users!.FirstOrDefault(p => p.Email == email)!;
-
-		return BCrypt.Net.BCrypt.Verify(password, user.Password) ? user : null!;
-	}
-
-	public User GetById(Guid id)
-	{
-		return _appDbContext.Users!
-			.Include(p => p.Account)
-			.FirstOrDefault(p => p.Id == id)!;
-
-	}
-
 	public User GetByCpf(string cpf)
 	{
 		var user = _appDbContext.Users!
