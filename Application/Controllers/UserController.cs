@@ -1,6 +1,5 @@
 using Application.InputModels;
 using Domain.Entities;
-using Domain.Enums;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +60,7 @@ public class UserController : ControllerBase
 	/// <response code="422">If there is no user</response>
 	[HttpDelete("{id}")]
 	[Authorize]
-	public IActionResult Delete(Guid id)
+	public IActionResult Delete([FromRoute] Guid id)
 	{
 		var deleteUser = _userService.Delete(id);
 
