@@ -42,9 +42,12 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddDbContext<AppDbContext>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IPixRepository, PixRepository>();
+
 builder.Services.AddScoped<IUserService<UserInputModel>, UserService>();
 builder.Services.AddScoped<ISignInService, SignInService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPixService, PixService>();
 
 var app = builder.Build();
 
