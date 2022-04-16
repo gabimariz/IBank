@@ -14,6 +14,13 @@ public class SignInService : ISignInService
 
 	public User SignIn(string email, string password)
 	{
-		return _userRepository.SignIn(email, password);
+		try
+		{
+			return _userRepository.SignIn(email, password);
+		}
+		catch (Exception)
+		{
+			return null!;
+		}
 	}
 }
