@@ -4,5 +4,5 @@ namespace Domain.Interfaces;
 
 public interface IPixService
 {
-	PixTransfer Transfer(double money, string toCpf, Guid fromId);
+	PixTransfer TransferByCpf(double money, string toCpf, Guid fromId);
 }

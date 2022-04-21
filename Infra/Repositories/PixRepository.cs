@@ -13,7 +13,7 @@ public class PixRepository : IPixRepository
 		_appDbContext = appDbContext;
 	}
 
-	public void Transfer(double money, Guid to, Guid from)
+	public void TransferByCpf(double money, Guid to, Guid from)
 	{
 		_appDbContext.PixTransfers!.Add(new PixTransfer
 		{
