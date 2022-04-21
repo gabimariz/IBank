@@ -7,7 +7,9 @@ public interface IUserService<in T>
 	User GetById(Guid id);
 	User GetByCpf(string cpf);
 
-	string Insert(T user);
+	User GetByEmail(string email);
+
+	void Insert(T user);
 
 	string Update(User user);
 
