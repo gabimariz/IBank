@@ -1,5 +1,6 @@
 using Application.InputModels;
 using Domain.Entities;
+using Domain.Exceptions;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,12 +28,15 @@ public class UserController : ControllerBase
 	[Authorize(Roles = "User")]
 	public ActionResult<User> GetById([FromRoute] Guid id)
 	{
-		var findUser = Ok(_userService.GetById(id));
+		try
+		{
+			return _userService.GetById(id);
 
-		if(findUser.Value != null)
-			return Ok(findUser);
-
-		return NotFound();
+		}
+		catch (UserNotFoundException)
+		{
+			return NoContent();
+		}
 	}
 
 	/// <summary>
@@ -44,12 +48,20 @@ public class UserController : ControllerBase
 	[HttpPost]
 	public IActionResult Post([FromBody] UserInputModel user)
 	{
-		var createUser = _userService.Insert(user);
+		try
+		{
+			var findCpf = _userService.GetByCpf(user.Cpf!);
+			var findEmail = _userService.GetByEmail(user.Email!);
 
-		if(!createUser.Contains("create"))
-			return UnprocessableEntity(createUser);
+			if(findCpf == null! || findEmail == null!)
+				_userService.Insert(user);
 
-		return Created(createUser, "Account create successfully!");
+			return Ok("Account create successfully!");
+		}
+		catch (RegisteredUserException)
+		{
+			return UnprocessableEntity("There is already a user already registered!");
+		}
 	}
 
 	/// <summary>
