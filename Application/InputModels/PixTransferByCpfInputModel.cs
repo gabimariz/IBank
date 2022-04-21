@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.InputModels;
 
-public class PixTransferInputModel
+public class PixTransferByCpfInputModel
 {
 	[Required(ErrorMessage = "Value is required")]
 	[Range(0.1, Double.MaxValue, ErrorMessage = "Value cannot be less than zero!")]
