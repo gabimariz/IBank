@@ -2,6 +2,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Infra.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Infra.Repositories;
 
@@ -34,6 +35,15 @@ public class UserRepository : IUserRepository
 		var user = _appDbContext.Users!
 			.Include(p => p.Account)
 			.FirstOrDefault(p => p.Cpf == cpf);
+
+		return user!;
+	}
+
+	public User GetByEmail(string email)
+	{
+		var user = _appDbContext.Users!
+			.Include(p => p.Account)
+			.FirstOrDefault(p => p.Email == email);
 
 		return user!;
 	}
