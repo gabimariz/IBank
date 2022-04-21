@@ -11,6 +11,8 @@ public class User
 
 	public string? Cpf { get; set; }
 
+	public string? PhoneNumber { get; set; }
+
 	public virtual Account? Account { get; set; }
 
 	public string? Email { get; set; }
