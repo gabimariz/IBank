@@ -5,6 +5,7 @@ namespace Application.InputModels;
 public class PixTransferInputModel
 {
 	[Required(ErrorMessage = "Value is required")]
+	[Range(0.1, Double.MaxValue, ErrorMessage = "Value cannot be less than zero!")]
 	public double Money { get; set; }
 
 	[Required(ErrorMessage = "Cpf is required")]
