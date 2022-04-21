@@ -1,5 +1,6 @@
 using Application.InputModels;
 using Domain.Entities;
+using Domain.Exceptions;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +20,15 @@ public class PixController : ControllerBase
 
 	[HttpPost]
 	[Authorize]
-	public ActionResult<PixTransfer> Transfer([FromBody] PixTransferInputModel transfer)
+	public ActionResult<PixTransfer> TransferByCpf([FromBody] PixTransferByCpfInputModel transfer)
 	{
-		return _pixService.Transfer(transfer.Money, transfer.ToCpf!, transfer.FromId);
+		try
+		{
+			return _pixService.TransferByCpf(transfer.Money, transfer.ToCpf!, transfer.FromId);
+		}
+		catch (WithoutMoneyException)
+		{
+			return UnprocessableEntity("Insufficient value!");
+		}
 	}
 }
