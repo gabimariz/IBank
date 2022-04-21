@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Domain.Exceptions;
 using Domain.Interfaces;
 using Infra.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,24 +23,24 @@ public class PixService : IPixService
 		_pixRepository = pixRepository;
 	}
 
-	public PixTransfer Transfer(double money, string toCpf, Guid fromId)
+	public PixTransfer TransferByCpf(double money, string toCpf, Guid fromId)
 	{
 		var fromUser = _appDbContext.Users!
 			.Include(p => p.Account)
 			.FirstOrDefault(p => p.Id == fromId);
 
-		var fromMoney = fromUser!.Account!.Money = fromUser.Account.Money - money;
+		if (fromUser!.Account!.Money <= 0)
+			throw new WithoutMoneyException();
 
-		if (fromMoney < 0 || money <= 0)
-			throw new Exception();
+		fromUser.Account!.Money -= money;
 
 		var toUser = _userRepository.GetByCpf(toCpf);
 
 		_userRepository.Save();
 
-		toUser.Account!.Money = toUser.Account.Money + money;
+		toUser.Account!.Money += money;
 
-		_pixRepository.Transfer(money, toUser.Id, Guid.NewGuid());
+		_pixRepository.TransferByCpf(money, toUser.Id, fromId);
 		_pixRepository.Save();
 
 		return new PixTransfer
@@ -47,7 +48,7 @@ public class PixService : IPixService
 			Id = Guid.NewGuid(),
 			Money = money,
 			To = toUser.Id,
-			From = Guid.NewGuid()
+			From = fromId
 		};
 	}
 }
