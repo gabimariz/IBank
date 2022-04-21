@@ -1,6 +1,7 @@
 using Application.InputModels;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.Exceptions;
 using Domain.Interfaces;
 using Domain.Utils;
 
@@ -17,21 +18,31 @@ public class UserService : IUserService<UserInputModel>
 
 	public User GetById(Guid id)
 	{
-		try
-		{
-			return _userRepository.GetById(id);
-		}
-		catch (Exception)
-		{
-			throw new Exception();
-		}
+		var user = _userRepository.GetById(id);
+
+		if (user == null) throw new UserNotFoundException();
+
+		return user;
 	}
 	public User GetByCpf(string cpf)
 	{
-		return _userRepository.GetByCpf(cpf);
+		var user = _userRepository.GetByCpf(cpf);
+
+		if (user != null) throw new RegisteredUserException();
+
+		return null!;
 	}
 
-	public string Insert(UserInputModel user)
+	public User GetByEmail(string email)
+	{
+		var user = _userRepository.GetByEmail(email);
+
+		if (user != null) throw new RegisteredUserException();
+
+		return null!;
+	}
+
+	public void Insert(UserInputModel user)
 	{
 
 			_userRepository.Insert(new User
@@ -52,8 +63,6 @@ public class UserService : IUserService<UserInputModel>
 			});
 
 			_userRepository.Save();
-
-			return "create";
 
 	}
 
