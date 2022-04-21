@@ -9,6 +9,8 @@ public interface IUserRepository : IDisposable
 	User GetById(Guid id);
 	User GetByCpf(string cpf);
 
+	User GetByEmail(string email);
+
 	void Insert(User user);
 
 	void Update(User user);
