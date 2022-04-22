@@ -45,4 +45,18 @@ public class PixController : ControllerBase
 			return UnprocessableEntity("Insufficient value!");
 		}
 	}
+
+	[HttpPost("Phone")]
+	[Authorize]
+	public ActionResult<PixTransfer> TransferByPhone([FromBody] PixTransferByPhoneInputModel transfer)
+	{
+		try
+		{
+			return _pixService.TransferByPhone(transfer.Money, transfer.ToPhone!, transfer.FromId);
+		}
+		catch (WithoutMoneyException)
+		{
+			return UnprocessableEntity("Insufficient value!");
+		}
+	}
 }
