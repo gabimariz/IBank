@@ -42,6 +42,15 @@ public class UserService : IUserService<UserInputModel>
 		return null!;
 	}
 
+	public User GetByPhone(string phoneNumber)
+	{
+		var user = _userRepository.GetByPhone(phoneNumber);
+
+		if (user != null) throw new RegisteredUserException();
+
+		return null!;
+	}
+
 	public void Insert(UserInputModel user)
 	{
 
