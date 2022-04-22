@@ -76,4 +76,31 @@ public class PixService : IPixService
 			From = fromId
 		};
 	}
+
+	public PixTransfer TransferByPhone(double money, string toPhone, Guid fromId)
+	{
+		var fromUser = _userRepository.GetById(fromId);
+
+		if (fromUser!.Account!.Money <= 0)
+			throw new WithoutMoneyException();
+
+		fromUser.Account!.Money -= money;
+
+		var toUser = _userRepository.GetByPhone(toPhone);
+
+		_userRepository.Save();
+
+		toUser.Account!.Money += money;
+
+		_pixRepository.Transfer(money, toUser.Id, fromId);
+		_pixRepository.Save();
+
+		return new PixTransfer
+		{
+			Id = Guid.NewGuid(),
+			Money = money,
+			To = toUser.Id,
+			From = fromId
+		};
+	}
 }
