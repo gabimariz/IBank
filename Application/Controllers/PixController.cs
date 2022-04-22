@@ -18,13 +18,27 @@ public class PixController : ControllerBase
 		_pixService = pixService;
 	}
 
-	[HttpPost]
+	[HttpPost("Cpf")]
 	[Authorize]
 	public ActionResult<PixTransfer> TransferByCpf([FromBody] PixTransferByCpfInputModel transfer)
 	{
 		try
 		{
 			return _pixService.TransferByCpf(transfer.Money, transfer.ToCpf!, transfer.FromId);
+		}
+		catch (WithoutMoneyException)
+		{
+			return UnprocessableEntity("Insufficient value!");
+		}
+	}
+
+	[HttpPost("Email")]
+	[Authorize]
+	public ActionResult<PixTransfer> TransferByEmail([FromBody] PixTransferByEmailInputModel transfer)
+	{
+		try
+		{
+			return _pixService.TransferByEmail(transfer.Money, transfer.ToEmail!, transfer.FromId);
 		}
 		catch (WithoutMoneyException)
 		{
