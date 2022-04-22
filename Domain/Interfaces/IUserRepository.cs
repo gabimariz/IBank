@@ -11,6 +11,8 @@ public interface IUserRepository : IDisposable
 
 	User GetByEmail(string email);
 
+	User GetByPhone(string phoneNumber);
+
 	void Insert(User user);
 
 	void Update(User user);
