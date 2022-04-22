@@ -48,6 +48,13 @@ public class UserRepository : IUserRepository
 		return user!;
 	}
 
+	public User GetByPhone(string phoneNumber)
+	{
+		return _appDbContext.Users!
+			.Include(p => p.Account)
+			.FirstOrDefault(p => p.PhoneNumber == phoneNumber)!;
+	}
+
 	public void Insert(User user)
 	{
 		_appDbContext.Users!.Add(user);
