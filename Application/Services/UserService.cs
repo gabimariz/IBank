@@ -66,6 +66,7 @@ public class UserService : IUserService<UserInputModel>
 					Bill =  GenerateAccount.New(),
 					Agency = "0001",
 					Money = 0,
+					Type = user.AccountType,
 				},
 				Email = user.Email,
 				Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
