@@ -59,6 +59,7 @@ public class UserService : IUserService<UserInputModel>
 				Id = Guid.NewGuid(),
 				FullName = user.FullName,
 				Cpf = user.Cpf,
+				PhoneNumber = user.PhoneNumber,
 				Account = new Account
 				{
 					Id = Guid.NewGuid(),
