@@ -9,6 +9,8 @@ public interface IUserService<in T>
 
 	User GetByEmail(string email);
 
+	User GetByPhone(string phoneNumber);
+
 	void Insert(T user);
 
 	string Update(User user);
