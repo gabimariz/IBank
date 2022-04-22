@@ -8,5 +8,5 @@ public interface IPixService
 
 	PixTransfer TransferByEmail(double money, string toEmail, Guid fromId);
 
-	//PixTransfer TransferByPhone(double money, string toPhone, Guid fromId);
+	PixTransfer TransferByPhone(double money, string toPhone, Guid fromId);
 }
