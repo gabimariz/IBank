@@ -25,9 +25,7 @@ public class PixService : IPixService
 
 	public PixTransfer TransferByCpf(double money, string toCpf, Guid fromId)
 	{
-		var fromUser = _appDbContext.Users!
-			.Include(p => p.Account)
-			.FirstOrDefault(p => p.Id == fromId);
+		var fromUser = _userRepository.GetById(fromId);
 
 		if (fromUser!.Account!.Money <= 0)
 			throw new WithoutMoneyException();
@@ -40,7 +38,34 @@ public class PixService : IPixService
 
 		toUser.Account!.Money += money;
 
-		_pixRepository.TransferByCpf(money, toUser.Id, fromId);
+		_pixRepository.Transfer(money, toUser.Id, fromId);
+		_pixRepository.Save();
+
+		return new PixTransfer
+		{
+			Id = Guid.NewGuid(),
+			Money = money,
+			To = toUser.Id,
+			From = fromId
+		};
+	}
+
+	public PixTransfer TransferByEmail(double money, string toEmail, Guid fromId)
+	{
+		var fromUser = _userRepository.GetById(fromId);
+
+		if (fromUser!.Account!.Money <= 0)
+			throw new WithoutMoneyException();
+
+		fromUser.Account!.Money -= money;
+
+		var toUser = _userRepository.GetByEmail(toEmail);
+
+		_userRepository.Save();
+
+		toUser.Account!.Money += money;
+
+		_pixRepository.Transfer(money, toUser.Id, fromId);
 		_pixRepository.Save();
 
 		return new PixTransfer
