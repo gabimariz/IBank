@@ -43,7 +43,9 @@ builder.Services.AddDbContext<AppDbContext>();
 
 builder.Services.AddTransient<IUserRepository, UserRepository>();
 builder.Services.AddTransient<IPixRepository, PixRepository>();
+builder.Services.AddTransient<IBankTransactionRepository, BankTransactionRepository>();
 
+builder.Services.AddScoped<IBankTransactionService<BankTransactionInputModel>, BankTransactionService>();
 builder.Services.AddScoped<IUserService<UserInputModel>, UserService>();
 builder.Services.AddScoped<ISignInService, SignInService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
