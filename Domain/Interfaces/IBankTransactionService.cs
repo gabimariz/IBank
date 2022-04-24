@@ -6,5 +6,5 @@ public interface IBankTransactionService<in T>
 {
 	BankTransaction TedTransfer(T transaction);
 
-	//BankTransaction DocTransfer<T>(T transaction);
+	BankTransaction DocTransfer(T transaction);
 }
