@@ -2,7 +2,6 @@ using Application.InputModels;
 using Domain.Entities;
 using Domain.Exceptions;
 using Domain.Interfaces;
-using Infra.Repositories;
 
 namespace Application.Services;
 
@@ -19,13 +18,18 @@ public class BankTransactionService: IBankTransactionService<BankTransactionInpu
 
 	public BankTransaction TedTransfer(BankTransactionInputModel transaction)
 	{
-		var fromUser = _userRepository.GetById(transaction.FromId!);
+		var fromUser = _userRepository.GetById(transaction.FromId);
+
+		if (DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+			throw new WeekendExpection();
+
+		if (DateTime.Now.Hour >= 17) throw new OvertimeException();
 
 		if (fromUser == null) throw new UserNotFoundException();
 
-		if (fromUser!.Account!.Money <= 0) throw new WithoutMoneyException();
+		if (fromUser.Account!.Money <= 0) throw new WithoutMoneyException();
 
-		fromUser.Account!.Money -= transaction.Money;
+		fromUser.Account!.Money -= (transaction.Money + 8.80);
 
 		var toUser = _userRepository.GetByCpf(transaction.Cpf!);
 
