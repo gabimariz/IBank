@@ -47,4 +47,40 @@ public class BankTransactionService: IBankTransactionService<BankTransactionInpu
 			TransactionType = transaction.Type
 		};
 	}
+
+	public BankTransaction DocTransfer(BankTransactionInputModel transaction)
+	{
+
+		if (transaction.Money > 4999)
+			throw new LimitExceededException();
+
+		var fromUser = _userRepository.GetById(transaction.FromId);
+
+		if (DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+			throw new WeekendExpection();
+
+		if (DateTime.Now.Hour >= 22) throw new OvertimeException();
+
+		if (fromUser == null) throw new UserNotFoundException();
+
+		if (fromUser.Account!.Money <= 0) throw new WithoutMoneyException();
+
+		fromUser.Account!.Money -= (transaction.Money + 8.90);
+
+		var toUser = _userRepository.GetByCpf(transaction.Cpf!);
+
+		toUser.Account!.Money += transaction.Money;
+
+		_transactionRepository.Transfer(transaction.Money, toUser.Id, fromUser.Id, transaction.Type);
+		_transactionRepository.Save();
+
+		return new BankTransaction
+		{
+			Id = Guid.NewGuid(),
+			Money = transaction.Money,
+			To = toUser.Id,
+			From = fromUser.Id,
+			TransactionType = transaction.Type
+		};
+	}
 }
