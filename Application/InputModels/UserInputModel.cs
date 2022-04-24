@@ -19,9 +19,10 @@ public class UserInputModel
 	public string? Email { get; set; }
 
 	[Required(ErrorMessage = "Account type cannot be empty!")]
-
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public AccountType AccountType { get; set; }
+
+	public double Money { get; set; } = 0;
 
 	[Required(ErrorMessage = "Password cannot be empty!")]
 	public string? Password { get; set; }
