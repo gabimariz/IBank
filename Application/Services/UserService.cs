@@ -65,7 +65,7 @@ public class UserService : IUserService<UserInputModel>
 					Id = Guid.NewGuid(),
 					Bill =  GenerateAccount.New(),
 					Agency = "0001",
-					Money = 0,
+					Money = user.Money,
 					Type = user.AccountType,
 				},
 				Email = user.Email,
