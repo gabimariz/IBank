@@ -33,5 +33,13 @@ public class BankTransactionController : ControllerBase
 		{
 			return UnprocessableEntity("Insufficient value!");
 		}
+		catch (WeekendExpection)
+		{
+			return StatusCode(423, "weekend transfers are not allowed!");
+		}
+		catch (OvertimeException)
+		{
+			return StatusCode(423, "TED transfers are allowed until 16:59");
+		}
 	}
 }
