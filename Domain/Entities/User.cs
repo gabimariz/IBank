@@ -15,6 +15,8 @@ public class User
 
 	public virtual Account? Account { get; set; }
 
+	public virtual Card? Card { get; set; }
+
 	public string? Email { get; set; }
 
 	[JsonIgnore]
