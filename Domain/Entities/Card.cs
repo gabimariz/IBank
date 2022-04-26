@@ -21,4 +21,6 @@ public class Card
 	public virtual User? User { get; set; }
 
 	public CardType Type { get; set; }
+
+	public DateTime Validity { get; set; }
 }
