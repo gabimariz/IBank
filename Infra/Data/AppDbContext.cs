@@ -18,7 +18,6 @@ public class AppDbContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		// Configure Student & StudentAddress entity
 		modelBuilder.Entity<Account>()
 			.HasOne<User>(e => e.User)
 			.WithOne(d => d.Account)
