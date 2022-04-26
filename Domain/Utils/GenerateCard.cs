@@ -40,6 +40,6 @@ public static class GenerateCard
 			cvv[i] = random.Next(0, 9);
 		}
 
-		return cvv.ToString()!;
+		return string.Join("", cvv.ToArray());
 	}
 }
