@@ -31,5 +31,15 @@ public class AppDbContext : DbContext
 
 		modelBuilder.Entity<User>()
 			.HasIndex(i => i.Cpf).IsUnique();
+
+		modelBuilder.Entity<Card>()
+			.HasOne<User>(e => e.User)
+			.WithOne(d => d.Card)
+			.HasForeignKey<Card>(e => e.UserId)
+			.IsRequired(true)
+			.OnDelete(DeleteBehavior.Cascade);
+
+		modelBuilder.Entity<Card>()
+			.HasIndex(i => i.Number).IsUnique();
 	}
 }
