@@ -10,6 +10,8 @@ public class AppDbContext : DbContext
 
 	public DbSet<BankTransaction>? BankTransactions { get; set; }
 
+	public DbSet<Card>? Cards { get; set; }
+
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
 		optionsBuilder.UseMySql("server=localhost;username=root;password=root;database=ibank",
