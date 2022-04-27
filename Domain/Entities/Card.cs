@@ -10,11 +10,9 @@ public class Card
 	[Key]
 	[JsonIgnore]
 	public Guid Id { get; set; }
-
-	[JsonIgnore]
+	
 	public string? Number { get; set; }
 
-	[JsonIgnore]
 	public int Cvv { get; set; }
 
 	public string? Password { get; set; }
