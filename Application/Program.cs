@@ -51,7 +51,7 @@ builder.Services.AddScoped<IUserService<UserInputModel>, UserService>();
 builder.Services.AddScoped<ISignInService, SignInService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPixService, PixService>();
-builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddScoped<ICardService<GetCardByUserIdInputModel>, CardService>();
 
 var app = builder.Build();
 
