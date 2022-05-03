@@ -13,4 +13,6 @@ public class BankTransaction
 	public Guid From { get; set; }
 
 	public TransactionType TransactionType { get; set; }
+
+	public DateTime TransferDate { get; set; } = DateTime.Now;
 }

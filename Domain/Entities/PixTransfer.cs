@@ -9,4 +9,6 @@ public class PixTransfer
 	public Guid To { get; set; }
 
 	public Guid From { get; set; }
+
+	public DateTime TransferDate { get; set; } = DateTime.Now;
 }

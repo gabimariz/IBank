@@ -10,7 +10,7 @@ public class Card
 	[Key]
 	[JsonIgnore]
 	public Guid Id { get; set; }
-	
+
 	public string? Number { get; set; }
 
 	public int Cvv { get; set; }
@@ -27,4 +27,6 @@ public class Card
 
 	[JsonIgnore]
 	public DateTime Validity { get; set; }
+
+	public DateTime CreateAt { get; set; } = DateTime.Now;
 }

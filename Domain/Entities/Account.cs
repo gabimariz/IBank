@@ -20,4 +20,6 @@ public class Account
 	public virtual User? User { get; set; }
 
 	public AccountType Type { get; set; }
+
+	public DateTime CreateAt { get; set; } = DateTime.Now;
 }

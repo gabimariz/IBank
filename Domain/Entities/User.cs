@@ -23,4 +23,6 @@ public class User
 	public string? Password { get; set; }
 
 	public Roles Role { get; set; }
+
+	public DateTime CreateAt { get; set; } = DateTime.Now;
 }
