@@ -4,6 +4,7 @@ using Domain.Exceptions;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NothingWasFoundException = Domain.Exceptions.NothingWasFoundException;
 
 namespace Application.Controllers;
 
@@ -57,6 +58,19 @@ public class PixController : ControllerBase
 		catch (WithoutMoneyException)
 		{
 			return UnprocessableEntity("Insufficient value!");
+		}
+	}
+
+	[HttpGet("{id}")]
+	public ActionResult<PixTransfer> TransferById(Guid id)
+	{
+		try
+		{
+			return _pixService.TransferById(id);
+		}
+		catch (NothingWasFoundException)
+		{
+			return NoContent();
 		}
 	}
 }
