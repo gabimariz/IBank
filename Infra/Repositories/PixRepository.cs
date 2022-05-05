@@ -23,6 +23,12 @@ public class PixRepository : IPixRepository
 		});
 	}
 
+	public PixTransfer TransferById(Guid id)
+	{
+		return _appDbContext.PixTransfers!
+			.FirstOrDefault(p => p.Id == id)!;
+	}
+
 	public void Save()
 	{
 		_appDbContext.SaveChanges();
