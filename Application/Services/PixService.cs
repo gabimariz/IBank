@@ -2,7 +2,6 @@ using Domain.Entities;
 using Domain.Exceptions;
 using Domain.Interfaces;
 using Infra.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
@@ -102,5 +101,15 @@ public class PixService : IPixService
 			To = toUser.Id,
 			From = fromId
 		};
+	}
+
+	public PixTransfer TransferById(Guid id)
+	{
+		var transfer = _pixRepository.TransferById(id);
+
+		if (transfer == null)
+			throw new NothingWasFoundException();
+
+		return transfer;
 	}
 }
