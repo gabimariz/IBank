@@ -1,32 +1,38 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Domain.Enums;
+using Domain.Entities.Enums;
 
 namespace Domain.Entities;
 
 public class Card
 {
-	[Key]
-	[JsonIgnore]
-	public Guid Id { get; set; }
+	[Column(name: "id")]
+   public Guid Id { get; set; }
 
-	public string? Number { get; set; }
+   [Column(name: "number")]
+   public string? Number { get; set; }
 
-	public int Cvv { get; set; }
+   [Column(name: "cvv")]
+   public string? Cvv { get; set; }
 
-	public string? Password { get; set; }
+   [Column(name: "password")]
+   public string? Password { get; set; }
 
-	[ForeignKey("User")]
-	public Guid UserId { get; set; }
+   [JsonIgnore]
+   public virtual Profile? Profile { get; set; }
 
-	[JsonIgnore]
-	public virtual User? User { get; set; }
+   [Column(name: "fk_profile")]
+   public Guid FkProfile { get; set; }
 
-	public CardType Type { get; set; }
+   [Column(name: "type")]
+   public CardType Type { get; set; }
 
-	[JsonIgnore]
-	public DateTime Validity { get; set; }
+   [Column(name: "validity")]
+   public DateTime Validity { get; set; }
 
-	public DateTime CreateAt { get; set; } = DateTime.Now;
+   [Column(name: "create_at")]
+   public DateTime CreateAt { get; set; }
+
+   [Column(name: "update_at")]
+   public DateTime UpdateAt { get; set; }
 }

@@ -6,34 +6,47 @@ namespace Infra.Repositories;
 
 public class CardRepository : ICardRepository
 {
-	private readonly AppDbContext _appDbContext;
+	private readonly AppDbContext _context;
 
-	public CardRepository(AppDbContext appDbContext)
+	/// <summary>
+	///     Context dependency injection
+	/// </summary>
+	/// <param name="context"></param>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public CardRepository(AppDbContext context)
 	{
-		_appDbContext = appDbContext;
+		_context = context;
 	}
 
-	public Card GetByCardNumber(Guid userId)
+	/// <summary>
+	///		Get a card by CardNumber
+	/// </summary>
+	/// <param name="cardNumber"></param>
+	/// <returns>Card</returns>
+	public Card GetByNumber(string cardNumber)
 	{
-		var card = _appDbContext.Cards!.FirstOrDefault(p => p.UserId == userId);
-
-		if (userId == card!.UserId)
-			return card;
-
-		return null!;
+		return _context.Cards!
+			.FirstOrDefault(p => p.Number == cardNumber)!;
 	}
-	public void Insert(Card card)
+
+	/// <summary>
+	///		Create a card
+	/// </summary>
+	/// <param name="card"></param>
+	public void Post(Card card)
 	{
-		_appDbContext.Cards!.Add(card);
+		_context.Cards!.Add(card);
+
+		Save();
 	}
 
 	public void Save()
 	{
-		_appDbContext.SaveChanges();
+		_context.SaveChanges();
 	}
 
 	public void Dispose()
 	{
-		_appDbContext.Dispose();
+		_context.Dispose();
 	}
 }

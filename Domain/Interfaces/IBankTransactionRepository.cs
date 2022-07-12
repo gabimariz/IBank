@@ -1,10 +1,11 @@
-using Domain.Enums;
+using Domain.Entities;
+using Domain.Models;
 
 namespace Domain.Interfaces;
 
 public interface IBankTransactionRepository : IDisposable
 {
-	void Transfer(double money, Guid to, Guid from, TransactionType type);
+	void Post(BankTransaction model);
 
 	void Save();
 }

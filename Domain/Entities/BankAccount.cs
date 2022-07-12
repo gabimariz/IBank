@@ -4,21 +4,28 @@ using Domain.Entities.Enums;
 
 namespace Domain.Entities;
 
-public class User
+public class BankAccount
 {
 	[Column(name: "id")]
 	public Guid Id { get; set; }
 
-	[Column(name: "email")]
-	public string? Email { get; set; }
+	[Column(name: "bill")]
+	public string? Bill { get; set; }
 
-	[Column(name: "password")]
-	public string? Password { get; set; }
+	[Column(name: "agency")]
+	public string? Agency { get; set; }
 
+	[Column(name: "money")]
+	public decimal Money { get; set; }
+
+	[JsonIgnore]
 	public virtual Profile? Profile { get; set; }
 
-	[Column(name: "role")]
-	public Roles Role { get; set; }
+	[Column(name: "fk_profile")]
+	public Guid FkProfile { get; set; }
+
+	[Column(name: "type")]
+	public AccountType Type { get; set; }
 
 	[Column(name: "create_at")]
 	public DateTime CreateAt { get; set; }

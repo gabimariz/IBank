@@ -4,20 +4,21 @@ namespace Domain.Interfaces;
 
 public interface IUserRepository : IDisposable
 {
-	User SignIn(string email, string password);
+  List<User> Get();
 
-	User GetById(Guid id);
-	User GetByCpf(string cpf);
+  User GetById(Guid id);
 
-	User GetByEmail(string email);
+  Profile GetByProfileId(Guid id);
 
-	User GetByPhone(string phoneNumber);
+  User GetByEmail(string email);
 
-	void Insert(User user);
+  User GetByCpf(string cpf);
 
-	void Update(User user);
+  User GetByPhoneNumber(string phoneNumber);
 
-	void Delete(Guid id);
+  void Post(User user);
 
-	void Save();
+  void Delete(Guid id);
+
+  void Save();
 }

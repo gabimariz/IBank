@@ -2,86 +2,138 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Infra.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Infra.Repositories;
 
 public class UserRepository : IUserRepository
 {
-	private readonly AppDbContext _appDbContext;
+	private readonly AppDbContext _context;
 
-	public UserRepository(AppDbContext appDbContext)
+	/// <summary>
+	///     Context dependency injection
+	/// </summary>
+	/// <param name="context"></param>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public UserRepository(AppDbContext context)
 	{
-		_appDbContext = appDbContext;
+		_context = context;
 	}
 
-	public User SignIn(string email, string password)
+	/// <summary>
+	///     Get all users in database
+	/// </summary>
+	/// <returns>List of users</returns>
+	public List<User> Get()
 	{
-		var user = _appDbContext.Users!.FirstOrDefault(p => p.Email == email)!;
-
-		return BCrypt.Net.BCrypt.Verify(password, user.Password) ? user : null!;
+		return _context.Users!
+			.Include(p => p.Profile)
+			.Include(p => p.Profile!.BankAccount)
+			.Include(p => p.Profile!.Card)
+			.ToList();
 	}
 
+	/// <summary>
+	///     Get user by ID in database
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns>User</returns>
 	public User GetById(Guid id)
 	{
-		return _appDbContext.Users!
-			.Include(p => p.Account)
+		return _context.Users!
+			.Include(p => p.Profile)
+			.Include(p => p.Profile!.BankAccount)
+			.Include(p => p.Profile!.Card)
 			.FirstOrDefault(p => p.Id == id)!;
-
 	}
 
-	public User GetByCpf(string cpf)
+	/// <summary>
+	///		Get profile by ID
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns>Profile</returns>
+	public Profile GetByProfileId(Guid id)
 	{
-		var user = _appDbContext.Users!
-			.Include(p => p.Account)
-			.FirstOrDefault(p => p.Cpf == cpf);
-
-		return user!;
+		return _context.Profiles!
+			.Include(p => p.BankAccount)
+			.Include(p => p.Card)
+			.FirstOrDefault(p => p.Id == id)!;
 	}
 
+	/// <summary>
+	///     Get user by EMAIL in database
+	/// </summary>
+	/// <param name="email"></param>
+	/// <returns>User</returns>
 	public User GetByEmail(string email)
 	{
-		var user = _appDbContext.Users!
-			.Include(p => p.Account)
-			.FirstOrDefault(p => p.Email == email);
-
-		return user!;
+		return _context.Users!
+			.Include(p => p.Profile)
+			.Include(p => p.Profile!.BankAccount)
+			.Include(p => p.Profile!.Card)
+			.FirstOrDefault(p => p.Email == email)!;
 	}
 
-	public User GetByPhone(string phoneNumber)
+	/// <summary>
+	///     Get user by CPF in database
+	/// </summary>
+	/// <param name="cpf"></param>
+	/// <returns>User</returns>
+	public User GetByCpf(string cpf)
 	{
-		return _appDbContext.Users!
-			.Include(p => p.Account)
-			.FirstOrDefault(p => p.PhoneNumber == phoneNumber)!;
+		return _context.Users!
+			.Include(p => p.Profile)
+			.Include(p => p.Profile!.BankAccount)
+			.FirstOrDefault(p => p.Profile!.Cpf == cpf)!;
 	}
 
-	public void Insert(User user)
+	/// <summary>
+	///     Get user by PhoneNumber in database
+	/// </summary>
+	/// <param name="phoneNumber"></param>
+	/// <returns>User</returns>
+	public User GetByPhoneNumber(string phoneNumber)
 	{
-		_appDbContext.Users!.Add(user);
+		return _context.Users!
+			.Include(p => p.Profile)
+			.Include(p => p.Profile!.BankAccount)
+			.Include(p => p.Profile!.Card)
+			.FirstOrDefault(p => p.Profile!.Cpf == phoneNumber)!;
 	}
 
-	public void Update(User user)
+	/// <summary>
+	///     Create a new user in database
+	/// </summary>
+	/// <param name="user"></param>
+	public void Post(User user)
 	{
-		_appDbContext.Entry(user).State = EntityState.Modified;
+		_context.Users!.Add(user);
+
+		Save();
 	}
 
+	/// <summary>
+	///     Delete one user by ID in database
+	/// </summary>
+	/// <param name="id"></param>
 	public void Delete(Guid id)
 	{
-		var user = _appDbContext.Users!
+		var user = _context.Users!
 			.Where(p => p.Id == id)
-			.Include(p => p.Account)
+			.Include(p => p.Profile)
 			.FirstOrDefault();
 
-		_appDbContext.Users!.Remove(user!);
+		_context.Users!.Remove(user!);
+
+		Save();
 	}
 
 	public void Save()
 	{
-		_appDbContext.SaveChanges();
+		_context.SaveChanges();
 	}
 
 	public void Dispose()
 	{
-		 _appDbContext.Dispose();
+		_context.Dispose();
 	}
 }

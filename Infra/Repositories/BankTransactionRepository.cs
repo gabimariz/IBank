@@ -1,5 +1,4 @@
 using Domain.Entities;
-using Domain.Enums;
 using Domain.Interfaces;
 using Infra.Data;
 
@@ -7,32 +6,36 @@ namespace Infra.Repositories;
 
 public class BankTransactionRepository : IBankTransactionRepository
 {
-	private readonly AppDbContext _appDbContext;
+	private readonly AppDbContext _context;
 
-	public BankTransactionRepository(AppDbContext appContext)
+	/// <summary>
+	///  Context dependency injection
+	/// </summary>
+	/// <param name="context"></param>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public BankTransactionRepository(AppDbContext context)
 	{
-		_appDbContext = appContext;
+		_context = context;
 	}
 
-	public void Transfer(double money, Guid to, Guid from, TransactionType type)
+	/// <summary>
+	///     Adds a new bank transactionto the database
+	/// </summary>
+	/// <param name="model"></param>
+	public void Post(BankTransaction model)
 	{
-		_appDbContext.BankTransactions!.Add(new BankTransaction
-		{
-			Id = Guid.NewGuid(),
-			Money = money,
-			To = to,
-			From = from,
-			TransactionType = type
-		});
+		_context.BankTransactions!.Add(model);
+
+		Save();
 	}
 
 	public void Save()
 	{
-		_appDbContext.SaveChanges();
+		_context.SaveChanges();
 	}
 
 	public void Dispose()
 	{
-		_appDbContext.Dispose();
+		_context.Dispose();
 	}
 }

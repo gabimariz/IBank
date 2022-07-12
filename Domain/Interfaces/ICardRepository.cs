@@ -4,8 +4,9 @@ namespace Domain.Interfaces;
 
 public interface ICardRepository : IDisposable
 {
-	Card GetByCardNumber(Guid userId);
-	void Insert(Card card);
+	Card GetByNumber(string cardNumber);
+
+	void Post(Card card);
 
 	void Save();
 }

@@ -1,86 +1,218 @@
-using Application.InputModels;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Domain.Exceptions;
 using Domain.Interfaces;
+using Domain.Models;
 
 namespace Application.Services;
 
-public class BankTransactionService: IBankTransactionService<BankTransactionInputModel>
+public class BankTransactionService : IBankTransactionService
 {
-	private readonly IUserRepository _userRepository;
-	private readonly IBankTransactionRepository _transactionRepository;
+	private readonly IBankTransactionRepository _bankTransaction;
+	private readonly IUserRepository _user;
 
-	public BankTransactionService(IUserRepository userRepository, IBankTransactionRepository transactionRepository)
+	/// <summary>
+	///		BankTransaction and User repository dependency injection
+	/// </summary>
+	/// <param name="bankTransaction"></param>
+	/// <param name="user"></param>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public BankTransactionService(IBankTransactionRepository bankTransaction, IUserRepository user)
 	{
-		_userRepository = userRepository;
-		_transactionRepository = transactionRepository;
+		_bankTransaction = bankTransaction;
+		_user = user;
 	}
 
-	public BankTransaction TedTransfer(BankTransactionInputModel transaction)
+	/// <summary>
+	///		Adds a new bank transaction by PIX Email
+	/// </summary>
+	/// <param name="model"></param>
+	/// <exception cref="UserNotFoundException"></exception>
+	/// <exception cref="WithoutMoneyException"></exception>
+	public void PostByEmail(TransactionByEmailInputModel model)
 	{
-		var fromUser = _userRepository.GetById(transaction.FromId);
+		var fromUser = _user.GetById(model.FromUserId);
+		var toUser = _user.GetByEmail(model.Email!);
 
-		if (DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-			throw new WeekendExpection();
+		if(fromUser == null || toUser == null)
+			throw new UserNotFoundException();
 
-		if (DateTime.Now.Hour >= 17) throw new OvertimeException();
+		if(fromUser.Profile!.BankAccount!.Money <= 0)
+			throw new WithoutMoneyException();
 
-		if (fromUser == null) throw new UserNotFoundException();
+		fromUser.Profile!.BankAccount!.Money -= model.Money;
+		toUser.Profile!.BankAccount!.Money += model.Money;
 
-		if (fromUser.Account!.Money <= 0) throw new WithoutMoneyException();
-
-		fromUser.Account!.Money -= (transaction.Money + 8.80);
-
-		var toUser = _userRepository.GetByCpf(transaction.Cpf!);
-
-		toUser.Account!.Money += transaction.Money;
-
-		_transactionRepository.Transfer(transaction.Money, toUser.Id, fromUser.Id, transaction.Type);
-		_transactionRepository.Save();
-
-		return new BankTransaction
+		_bankTransaction.Post(new BankTransaction
 		{
 			Id = Guid.NewGuid(),
-			Money = transaction.Money,
+			Money = model.Money,
 			To = toUser.Id,
 			From = fromUser.Id,
-			TransactionType = transaction.Type
-		};
+			Type = model.Type,
+			CreateAt = DateTime.Now,
+			UpdateAt = DateTime.Now
+		});
 	}
 
-	public BankTransaction DocTransfer(BankTransactionInputModel transaction)
+	/// <summary>
+	///		Adds a new bank transaction by PIX CPF
+	/// </summary>
+	/// <param name="model"></param>
+	/// <exception cref="UserNotFoundException"></exception>
+	/// <exception cref="WithoutMoneyException"></exception>
+	public void PostByCpf(TransactionByCpfInputModel model)
 	{
+		var fromUser = _user.GetById(model.FromUserId);
+		var toUser = _user.GetByCpf(model.Cpf!);
 
-		if (transaction.Money > 4999)
+		if(fromUser == null || toUser == null)
+            throw new UserNotFoundException();
+
+		if(fromUser.Profile!.BankAccount!.Money <= 0)
+			throw new WithoutMoneyException();
+
+		fromUser.Profile!.BankAccount!.Money -= model.Money;
+		toUser.Profile!.BankAccount!.Money += model.Money;
+
+		_user.Save();
+
+		_bankTransaction.Post(new BankTransaction
+		{
+			Id = Guid.NewGuid(),
+			Money = model.Money,
+			To = toUser.Id,
+			From = fromUser.Id,
+			Type = model.Type,
+			CreateAt = DateTime.Now,
+			UpdateAt = DateTime.Now
+		});
+    }
+
+	/// <summary>
+	///		Adds a new bank transaction by PIX PhoneNumber
+	/// </summary>
+	/// <param name="model"></param>
+	/// <exception cref="UserNotFoundException"></exception>
+	/// <exception cref="WithoutMoneyException"></exception>
+	public void PostByPhoneNumber(TransactionByPhoneNumberInputModel model)
+	{
+		var fromUser = _user.GetById(model.FromUserId);
+		var toUser = _user.GetByPhoneNumber(model.PhoneNumber!);
+
+		if(fromUser == null || toUser == null)
+			throw new UserNotFoundException();
+
+		if(fromUser.Profile!.BankAccount!.Money <= 0)
+			throw new WithoutMoneyException();
+
+		fromUser.Profile!.BankAccount!.Money -= model.Money;
+		toUser.Profile!.BankAccount!.Money += model.Money;
+
+		_bankTransaction.Post(new BankTransaction
+		{
+			Id = Guid.NewGuid(),
+			Money = model.Money,
+			To = toUser.Id,
+			From = fromUser.Id,
+			Type = model.Type,
+			CreateAt = DateTime.Now,
+			UpdateAt = DateTime.Now
+		});
+	}
+
+	/// <summary>
+	///		Adds a new bank transaction by TED
+	/// </summary>
+	/// <param name="model"></param>
+	/// <exception cref="UserNotFoundException"></exception>
+	/// <exception cref="WithoutMoneyException"></exception>
+	/// <exception cref="ManyDifferentException"></exception>
+	public void PostByTed(TransactionByTedAndDocInputModel model)
+	{
+		var fromUser = _user.GetById(model.FromUserId);
+		var toUser = _user.GetByCpf(model.Cpf!);
+
+		if(DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+			throw new WeekendException();
+
+		if(DateTime.Now.Hour >= 17) throw new OvertimeException();
+
+		if(fromUser == null || toUser == null)
+			throw new UserNotFoundException();
+
+		if(fromUser.Profile!.BankAccount!.Money <= 0)
+			throw new WithoutMoneyException();
+
+		if(toUser.Profile!.Name != model.Name
+		   && toUser.Profile!.BankAccount!.Agency != model.Agency
+		   && toUser.Profile!.BankAccount!.Bill != model.Bill)
+			throw new ManyDifferentException();
+
+		fromUser.Profile!.BankAccount!.Money -= model.Money;
+		toUser.Profile!.BankAccount!.Money += model.Money;
+
+		_user.Save();
+
+		_bankTransaction.Post(new BankTransaction
+		{
+			Id = Guid.NewGuid(),
+			Money = model.Money,
+			To = toUser.Id,
+			From = fromUser.Id,
+			Type = TransactionType.Ted,
+			CreateAt = DateTime.Now,
+			UpdateAt = DateTime.Now
+		});
+	}
+
+	/// <summary>
+	///		Adds anew bank transaction by DOC
+	/// </summary>
+	/// <param name="model"></param>
+	/// <exception cref="WeekendException"></exception>
+	/// <exception cref="OvertimeException"></exception>
+	/// <exception cref="UserNotFoundException"></exception>
+	/// <exception cref="WithoutMoneyException"></exception>
+	/// <exception cref="ManyDifferentException"></exception>
+	public void PostByDoc(TransactionByTedAndDocInputModel model)
+	{
+		if (model.Money > 4999)
 			throw new LimitExceededException();
 
-		var fromUser = _userRepository.GetById(transaction.FromId);
+		var fromUser = _user.GetById(model.FromUserId);
+		var toUser = _user.GetByCpf(model.Cpf!);
 
-		if (DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
-			throw new WeekendExpection();
+		if(DateTime.Now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+			throw new WeekendException();
 
-		if (DateTime.Now.Hour >= 22) throw new OvertimeException();
+		if(DateTime.Now.Hour >= 22) throw new OvertimeException();
 
-		if (fromUser == null) throw new UserNotFoundException();
+		if(fromUser is null || toUser is null)
+			throw new UserNotFoundException();
 
-		if (fromUser.Account!.Money <= 0) throw new WithoutMoneyException();
+		if(fromUser.Profile!.BankAccount!.Money <= 0)
+			throw new WithoutMoneyException();
 
-		fromUser.Account!.Money -= (transaction.Money + 8.90);
+		if(toUser.Profile!.Name != model.Name
+		   && toUser.Profile!.BankAccount!.Agency != model.Agency
+		   && toUser.Profile!.BankAccount!.Bill != model.Bill)
+			throw new ManyDifferentException();
 
-		var toUser = _userRepository.GetByCpf(transaction.Cpf!);
+		fromUser.Profile!.BankAccount!.Money -= model.Money;
+		toUser.Profile!.BankAccount!.Money += model.Money;
 
-		toUser.Account!.Money += transaction.Money;
+		_user.Save();
 
-		_transactionRepository.Transfer(transaction.Money, toUser.Id, fromUser.Id, transaction.Type);
-		_transactionRepository.Save();
-
-		return new BankTransaction
+		_bankTransaction.Post(new BankTransaction
 		{
 			Id = Guid.NewGuid(),
-			Money = transaction.Money,
+			Money = model.Money,
 			To = toUser.Id,
 			From = fromUser.Id,
-			TransactionType = transaction.Type
-		};
+			Type = TransactionType.Doc,
+			CreateAt = DateTime.Now,
+			UpdateAt = DateTime.Now
+		});
 	}
 }

@@ -1,7 +1,12 @@
 namespace Domain.Utils;
 
-public static class GenerateCard
+public class GenerateCard
 {
+
+	/// <summary>
+	///		Create a new card number
+	/// </summary>
+	/// <returns>Card number</returns>
 	public static string New()
 	{
 		Random random = new Random(DateTime.Now.Millisecond);
@@ -29,6 +34,10 @@ public static class GenerateCard
 		return string.Join("", card.ToArray()) + (soma % 10);
 	}
 
+	/// <summary>
+	///		Create a card cvv
+	/// </summary>
+	/// <returns>Card cvv</returns>
 	public static string Cvv()
 	{
 		Random random = new Random(DateTime.Now.Millisecond);

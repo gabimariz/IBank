@@ -1,10 +1,16 @@
-using Domain.Entities;
+using Domain.Models;
 
 namespace Domain.Interfaces;
 
-public interface IBankTransactionService<in T>
+public interface IBankTransactionService
 {
-	BankTransaction TedTransfer(T transaction);
+	void PostByEmail(TransactionByEmailInputModel model);
 
-	BankTransaction DocTransfer(T transaction);
+	void PostByCpf(TransactionByCpfInputModel model);
+
+	void PostByPhoneNumber(TransactionByPhoneNumberInputModel model);
+
+	void PostByTed(TransactionByTedAndDocInputModel model);
+
+	void PostByDoc(TransactionByTedAndDocInputModel model);
 }

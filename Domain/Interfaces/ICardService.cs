@@ -1,9 +1,11 @@
 using Domain.Entities;
+using Domain.Models;
 
 namespace Domain.Interfaces;
 
-public interface ICardService<in T>
+public interface ICardService
 {
-	Card GetByCardNumber(T input);
-	Card Create(Card card);
+	Card GetByNumber(string cardNumber);
+
+	void Post(CardInputModel card);
 }

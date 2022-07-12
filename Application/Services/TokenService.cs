@@ -10,22 +10,27 @@ namespace Application.Services;
 
 public class TokenService : ITokenService
 {
-	public string GenerateToken(User user)
+	/// <summary>
+	///  Generate a new user token
+	/// </summary>
+	/// <param name="user"></param>
+	/// <returns>Token</returns>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public string Get(User user)
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var key = Encoding.ASCII.GetBytes(Settings.Secret);
 
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
-			Subject = new ClaimsIdentity(new []
+			Subject = new ClaimsIdentity(new[]
 			{
 				new Claim(ClaimTypes.Email, user.Email!),
 				new Claim(ClaimTypes.Role, user.Role.ToString())
 			}),
 			Expires = DateTime.UtcNow.AddHours(4),
 			SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-				SecurityAlgorithms.HmacSha256Signature),
-
+				SecurityAlgorithms.HmacSha256Signature)
 		};
 
 		var token = tokenHandler.CreateToken(tokenDescriptor);

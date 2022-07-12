@@ -1,19 +1,21 @@
 using Domain.Entities;
+using Domain.Models;
 
 namespace Domain.Interfaces;
 
-public interface IUserService<in T>
+public interface IUserService
 {
+	List<User> Get();
+
 	User GetById(Guid id);
-	User GetByCpf(string cpf);
 
 	User GetByEmail(string email);
 
-	User GetByPhone(string phoneNumber);
+	User GetByCpf(string cpf);
 
-	void Insert(T user);
+	User GetByPhoneNumber(string phoneNumber);
 
-	string Update(User user);
+	void Post(UserInputModel user);
 
-	string Delete(Guid id);
+	void Delete(Guid id);
 }

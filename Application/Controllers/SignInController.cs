@@ -1,36 +1,60 @@
-using Application.InputModels;
+using Domain.Exceptions;
 using Domain.Interfaces;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Controllers;
 
 [ApiController]
-[Route("v1/[controller]")]
+[Route("v2")]
 public class SignInController : ControllerBase
 {
-	private readonly ISignInService _signInService;
-	private readonly ITokenService _tokenService;
+	private readonly ISignInService _signIn;
+	private readonly ITokenService _token;
 
-	public SignInController(ISignInService signInService, ITokenService tokenService)
+	/// <summary>
+	///     SignIn and Token Service dependency injection
+	/// </summary>
+	/// <param name="signIn"></param>
+	/// <param name="token"></param>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public SignInController(ISignInService signIn, ITokenService token)
 	{
-		_signInService = signInService;
-		_tokenService = tokenService;
+		_signIn = signIn;
+		_token = token;
 	}
 
-	[HttpPost]
-	public ActionResult<dynamic> AuthenticateAsync([FromBody] SignInInputModel signIn)
+	/// <summary>
+	///     Sign in user account
+	/// </summary>
+	/// <param name="model"></param>
+	/// <response code="200">OK</response>
+	/// <response code="204">No Content</response>
+	/// <response code="400">Bad Request</response>
+	/// <returns>User, Token</returns>
+	[HttpPost("signin")]
+	public ActionResult<dynamic> Post(SignInInputModel model)
 	{
-		var user = _signInService.SignIn(signIn.Email!, signIn.Password!);
-
-		if (user == null!)
-			return NotFound(new { message = "user not found!" });
-
-		var token = _tokenService.GenerateToken(user);
-
-		return new
+		try
 		{
-			user,
-			token
-		};
+			var user = _signIn.GetByEmail(model);
+
+			var token = _token.Get(user);
+
+			return Ok(
+				new
+				{
+					user,
+					token
+				});
+		}
+		catch (EmailNotFoundException err)
+		{
+			return NotFound(new { message = err });
+		}
+		catch (InvalidPasswordException err)
+		{
+			return BadRequest(new { message = err });
+		}
 	}
 }

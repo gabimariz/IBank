@@ -1,46 +1,69 @@
-using Application.InputModels;
 using Domain.Entities;
+using Domain.Entities.Enums;
 using Domain.Exceptions;
 using Domain.Interfaces;
+using Domain.Models;
 using Domain.Utils;
 
 namespace Application.Services;
 
-public class CardService : ICardService<GetCardByUserIdInputModel>
+public class CardService : ICardService
 {
-	private readonly ICardRepository _cardRepository;
+	private readonly ICardRepository _card;
+	private readonly IUserRepository _user;
 
-	public CardService(ICardRepository cardRepository)
+	/// <summary>
+	///		Repository dependency injection
+	/// </summary>
+	/// <param name="card"></param>
+	/// <param name="user"></param>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public CardService(ICardRepository card, IUserRepository user)
 	{
-		_cardRepository = cardRepository;
+		_card = card;
+		_user = user;
 	}
 
-	public Card GetByCardNumber(GetCardByUserIdInputModel input)
+	/// <summary>
+	///		Get card by number
+	/// </summary>
+	/// <param name="cardNumber"></param>
+	/// <returns></returns>
+	/// <exception cref="NotFoundException"></exception>
+	public Card GetByNumber(string cardNumber)
 	{
-		var card = _cardRepository.GetByCardNumber(input.UserId);
+		var card = _card.GetByNumber(cardNumber);
 
 		if (card == null)
-			throw new UnlinkedCardException();
+			throw new NotFoundException();
 
 		return card;
 	}
 
-	public Card Create(Card card)
+	/// <summary>
+	///	Create a new Card
+	/// </summary>
+	/// <param name="model"></param>
+	public void Post(CardInputModel model)
 	{
-		var newCard = new Card
+		var user = _user.GetByProfileId(model.ProfileId);
+
+		var date = DateTime.Now;
+
+		if (user == null)
+			throw new NotFoundException();
+
+		_card.Post(new Card
 		{
 			Id = Guid.NewGuid(),
 			Number = GenerateCard.New(),
-			Cvv = int.Parse(GenerateCard.Cvv()),
-			Password = BCrypt.Net.BCrypt.HashPassword(card.Password),
-			UserId = card.UserId,
-			Type = card.Type,
-			Validity = DateTime.Now
-		};
-
-		_cardRepository.Insert(newCard);
-		_cardRepository.Save();
-
-		return newCard;
+			Cvv = GenerateCard.Cvv(),
+			Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
+			FkProfile = model.ProfileId,
+			Type = CardType.Debit,
+			Validity = date.AddYears(8),
+			CreateAt = date,
+			UpdateAt = date
+		});
 	}
 }

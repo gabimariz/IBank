@@ -1,8 +1,9 @@
 using Domain.Entities;
+using Domain.Models;
 
 namespace Domain.Interfaces;
 
 public interface ISignInService
 {
-	User SignIn(string email, string password);
+	User GetByEmail(SignInInputModel email);
 }

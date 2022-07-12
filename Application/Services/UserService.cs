@@ -1,118 +1,158 @@
-using Application.InputModels;
 using Domain.Entities;
-using Domain.Enums;
+using Domain.Entities.Enums;
 using Domain.Exceptions;
 using Domain.Interfaces;
+using Domain.Models;
 using Domain.Utils;
 
 namespace Application.Services;
 
-public class UserService : IUserService<UserInputModel>
+public class UserService : IUserService
 {
-	private readonly IUserRepository _userRepository;
+	private readonly IUserRepository _repository;
 
-	public UserService(IUserRepository userRepository)
+	/// <summary>
+	///     Service dependency injection
+	/// </summary>
+	/// <param name="repository"></param>
+	/// <remarks>DON'T MOVE HERE</remarks>
+	public UserService(IUserRepository repository)
 	{
-		_userRepository = userRepository;
+		_repository = repository;
 	}
 
+	/// <summary>
+	///     Get all users in database
+	/// </summary>
+	/// <returns>all users</returns>
+	/// <exception cref="UserNotFoundException"></exception>
+	public List<User> Get()
+	{
+		var users = _repository.Get();
+
+		if(users == null)
+			throw new UserNotFoundException();
+
+		return users;
+	}
+
+	/// <summary>
+	///     Get one user by ID
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns>User</returns>
+	/// <exception cref="UserNotFoundException"></exception>
 	public User GetById(Guid id)
 	{
-		var user = _userRepository.GetById(id);
+		var user = _repository.GetById(id);
 
-		if (user == null) throw new UserNotFoundException();
+		if(user == null)
+			throw new UserNotFoundException();
 
 		return user;
 	}
-	public User GetByCpf(string cpf)
-	{
-		var user = _userRepository.GetByCpf(cpf);
 
-		if (user != null) throw new RegisteredUserException();
-
-		return null!;
-	}
-
+	/// <summary>
+	///     Get user by EMAIL
+	/// </summary>
+	/// <param name="email"></param>
+	/// <returns>User</returns>
+	/// <exception cref="EmailNotFoundException"></exception>
 	public User GetByEmail(string email)
 	{
-		var user = _userRepository.GetByEmail(email);
+		var user = _repository.GetByEmail(email);
 
-		if (user != null) throw new RegisteredUserException();
+		if(user == null)
+			throw new EmailNotFoundException();
 
-		return null!;
+		return user;
 	}
 
-	public User GetByPhone(string phoneNumber)
+	/// <summary>
+	///     Get user by CPF
+	/// </summary>
+	/// <param name="cpf"></param>
+	/// <returns>User</returns>
+	/// <exception cref="UserNotFoundException"></exception>
+	public User GetByCpf(string cpf)
 	{
-		var user = _userRepository.GetByPhone(phoneNumber);
+		var user = _repository.GetByCpf(cpf);
 
-		if (user != null) throw new RegisteredUserException();
+		if(user == null)
+			throw new UserNotFoundException();
 
-		return null!;
+		return user;
 	}
 
-	public void Insert(UserInputModel user)
+	/// <summary>
+	///     Get user by PhoneNumber
+	/// </summary>
+	/// <param name="phoneNumber"></param>
+	/// <returns>User</returns>
+	/// <exception cref="UserNotFoundException"></exception>
+	public User GetByPhoneNumber(string phoneNumber)
 	{
+		var user = _repository.GetByPhoneNumber(phoneNumber);
 
-			_userRepository.Insert(new User
+		if(user == null)
+			throw new UserNotFoundException();
+
+		return user;
+	}
+
+	/// <summary>
+	///     Create new user
+	/// </summary>
+	/// <param name="model"></param>
+	/// <exception cref="ExistingAccountException"></exception>
+	public void Post(UserInputModel model)
+	{
+		var user = _repository.GetByEmail(model.Email!);
+
+		if(user != null)
+			throw new ExistingAccountException();
+
+		var userId = Guid.NewGuid();
+		var profileId = Guid.NewGuid();
+
+		_repository.Post(new User
+		{
+			Id = userId,
+			Email = model.Email,
+			Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
+			Profile = new Profile
 			{
 				Id = Guid.NewGuid(),
-				FullName = user.FullName,
-				Cpf = user.Cpf,
-				PhoneNumber = user.PhoneNumber,
-				Account = new Account
+				Name = model.Name,
+				Cpf = model.Cpf,
+				PhoneNumber = model.PhoneNumber,
+				FkUser = userId,
+				BankAccount = new BankAccount
 				{
-					Id = Guid.NewGuid(),
-					Bill =  GenerateAccount.New(),
+					Id = profileId,
+					Bill = GenerateBankAccount.New(),
 					Agency = "0001",
-					Money = user.Money,
-					Type = user.AccountType,
+					Money = 0,
+					FkProfile = profileId,
+					Type = model.AccountType,
+					CreateAt = model.CreateAt,
+					UpdateAt = model.UpdateAt
 				},
-				Email = user.Email,
-				Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
-				Role = Roles.User
-			});
-
-			_userRepository.Save();
-
+				CreateAt = model.CreateAt,
+				UpdateAt = model.UpdateAt
+			},
+			Role = Roles.User,
+			CreateAt = model.CreateAt,
+			UpdateAt = model.UpdateAt
+		});
 	}
 
-	public string Update(User user)
+	/// <summary>
+	///     Delete user by ID
+	/// </summary>
+	/// <param name="id"></param>
+	public void Delete(Guid id)
 	{
-		try
-		{
-			_userRepository.Update(new User
-			{
-				Id = user.Id,
-				FullName = user.FullName,
-				Cpf = user.Cpf,
-				Account = user.Account,
-				Email = user.Email,
-				Password = user.Password,
-			});
-
-			_userRepository.Save();
-
-			return "Account successfully updated!";
-		}
-		catch (Exception err)
-		{
-			return($"{nameof(user)} could not be update: {err.Message}");
-		}
-	}
-
-	public string Delete(Guid id)
-	{
-		try
-		{
-			_userRepository.Delete(id);
-			_userRepository.Save();
-
-			return "deleted";
-		}
-		catch (Exception err)
-		{
-			return($"{nameof(id)}: {err.Message}");
-		}
+		_repository.Delete(id);
 	}
 }

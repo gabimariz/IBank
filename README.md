@@ -1,4 +1,4 @@
-# IBank API
+# Project Ibank
 
 ## Installation
 
